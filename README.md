@@ -1,12 +1,10 @@
 # CChip8
 
-Currently WIP Chip-8 interpreter / emulator running with Simple2D, written in C.
+Working Chip-8 interpreter / emulator with Simple2D, written in C.
 
-Current state : Roms should load and start to play. Currently no timing nor input handling.
+Install Simple2D and compile project : cc *.c `simple2d --libs` -o cchip8
 
-Install Simple2D and compile project : cc *.c `simple2d --libs` -o main
-
-Then execute main ./roms/INVADERS
+Then execute cchip8 ./roms/INVADERS (etc)
 
 #### Credits
 
