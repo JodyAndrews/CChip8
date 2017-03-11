@@ -16,7 +16,7 @@ int rom_load(const char *filename, struct config *config)
 		strcat(newFilename, "/");
 		strcat(newFilename, filename);
 
-		printf("\nNo folder specified. Using %s\n", newFilename);
+		printf("\nNo folder specified. Using [%s]\n", config->rom_path);
 		file = fopen(newFilename, "rb");
 	} else {
 		file = fopen(filename, "rb");
