@@ -18,4 +18,6 @@ Alexander's superb JS Chip-8 Emulator : https://github.com/alexanderdickson/Chip
 
 David Winter : http://www.pong-story.com/chip8/
 
+Simple2D : https://github.com/simple2d/simple2d
+
 ![Alt text](/images/invaders.png?raw=true "INVADERS")
