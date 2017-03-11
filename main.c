@@ -2,7 +2,7 @@
  * main.c
  * Simple2D based Chip8 Interpreter
  * 
- * cc *.c `simple2d --libs` -o main
+ * cc *.c `simple2d --libs` -o cchip8
  */
 
 #include <stdio.h>
@@ -30,7 +30,7 @@ struct config get_config(char *filename)
 		while(fgets(line, sizeof(line), file) != NULL)
 		{
 			char *cfline;
-			cfline = strstr((char *)line,DELIM);			
+			cfline = strstr((char *)line,DELIM);
 			cfline = cfline + strlen(DELIM);
 
 			unsigned char value;
@@ -80,10 +80,6 @@ void render() {
 			rect(x * pixel_size, y * pixel_size, pixel_size, 0, g, 0);
 		}
 	}
-}
-
-void update() {
-	cpu_cycle();
 }
 
 void on_key(S2D_Event e, const char *key) {
@@ -190,7 +186,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	S2D_Window *window = S2D_CreateWindow(
-		"CChip8", configstruct.pixel_size * 64, configstruct.pixel_size * 32, update, render, 0
+		"CChip8", configstruct.pixel_size * 64, configstruct.pixel_size * 32, cpu_cycle, render, 0
 	);
 	
 	window->on_key = on_key;
