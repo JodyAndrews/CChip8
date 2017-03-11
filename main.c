@@ -60,6 +60,7 @@ struct config get_config(char *filename)
 			
 			i++;
 		}
+		fclose(file);
 		printf("\n");
 	} else {
 		fclose(file);
