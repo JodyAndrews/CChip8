@@ -30,16 +30,17 @@ struct config get_config(char *filename)
 		while(fgets(line, sizeof(line), file) != NULL)
 		{
 			char *cfline;
-			cfline = strstr((char *)line,DELIM);
+			cfline = strstr((char *)line,DELIM);			
 			cfline = cfline + strlen(DELIM);
-			char str_buffer[MAXBUF];
-			memcpy(str_buffer, cfline, strlen(cfline));
+
+			unsigned char value;
+			value = strtol(cfline, NULL, 0);
 			
 			if (i == 0) {
-				configstruct.pixel_size = atoi(str_buffer);
+				configstruct.pixel_size = value;
 				printf("\npixel size [%d]", configstruct.pixel_size);
 			} else if (i == 1) {
-				configstruct.verbose = atoi(str_buffer);
+				configstruct.verbose = value;
 				printf(" | verbose [%d]", configstruct.verbose);
 			}
 			

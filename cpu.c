@@ -362,7 +362,7 @@ void execute_instruction(unsigned short opcode)
 	
 	x = (opcode & 0x0F00) >> 8;
 	y = (opcode & 0x00F0) >> 4;
-	
+
 	if (_config->verbose == 1) {
 		printf("step %d / %d / pc %d / x %d / y %d / sp %d / dt %d / vy14 %d\n", cycle_count, opcode, _pc, _v[x], _v[y], _sp, _dt, _v[14]);
 	}
