@@ -81,9 +81,7 @@ void cls()
 /// </summary>
 void ret()
 {
-	printf("\nRET");
 	_pc = _stack[--_sp];
-	printf("\n%d", _pc);
 }
 
 /// <summary>
@@ -324,7 +322,6 @@ void rnd(unsigned char ax, unsigned char kk)
 /// <param name="ax">ax</param>
 void bcd(unsigned char ax)
 {
-	printf("BCD");
 	unsigned char number = _v[ax];
 	
 	unsigned int i;
@@ -343,7 +340,7 @@ unsigned char *get_display()
 void execute_instruction(unsigned short opcode) 
 {
 	emu_step++;
-	printf("\nstep %d / %d / pc %d", emu_step, opcode, _pc);
+	//printf("\nstep %d / %d / pc %d", emu_step, opcode, _pc);
 	
 	unsigned char x = (opcode & 0x0F00) >> 8;
 	unsigned char y = (opcode & 0x00F0) >> 4;
