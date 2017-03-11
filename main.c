@@ -41,12 +41,6 @@ struct config get_config(char *filename)
 			} else if (i == 1) {
 				configstruct.verbose = atoi(str_buffer);
 				printf(" | verbose [%d]", configstruct.verbose);
-			} else if (i == 2) {
-				configstruct.window_width = atoi(str_buffer);
-				printf(" | window width [%d]", configstruct.window_width);
-			} else if (i == 3) {
-				configstruct.window_height = atoi(str_buffer);
-				printf(" | window height [%d]", configstruct.window_height);
 			}
 			
 			i++;
@@ -128,7 +122,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	S2D_Window *window = S2D_CreateWindow(
-		"CChip8", configstruct.window_width, configstruct.window_height, update, render, 0
+		"CChip8", configstruct.pixel_size * 64, configstruct.pixel_size * 32, update, render, 0
 	);
 	
 	window->on_key = on_key;
