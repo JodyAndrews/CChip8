@@ -16,7 +16,7 @@ unsigned short _stack[16];
 short _sp;
 unsigned char _st;
 unsigned char _dt;
-int emu_step = 0;
+int cycle_count = 0;
 struct config *_config;
 int _keys[16];
 
@@ -93,21 +93,6 @@ void ret()
 }
 
 /// <summary>
-/// ADD Vx, kk
-/// 
-/// Adds Vx to kk and stores result at Vx
-/// 
-/// Sets carry register if necessary
-/// </summary>
-/// <param name="ax">ax</param>
-/// <param name="kk">kk</param>
-void add(unsigned char ax, unsigned char kk)
-{
-	_v[0xf] = _v[ax] + kk > 255 ? 1 : 0;
-	_v[ax] += kk;
-}
-
-/// <summary>
 /// JP kkk
 /// 
 /// Jumps to address kkk
@@ -124,9 +109,12 @@ void jp(unsigned short kkk)
 /// <param name="addr">addr</param>
 void call(unsigned short addr)
 {
-	_stack[_sp] = _pc;
+	/*_stack[_sp] = _pc;
 	_pc = addr;
-	_sp++;
+	_sp++;*/
+	
+	_stack[_sp++] = _pc;
+	_pc = addr;
 }
 
 /// <summary>
@@ -138,10 +126,50 @@ void call(unsigned short addr)
 /// <param name="kk">kk</param>
 void se(unsigned char ax, unsigned char kk)
 {
+	printf("\n (SE) %d %d", _v[ax], kk); 
 	if (_v[ax] == kk) 
 	{
 		_pc += 2;
 	}
+}
+
+/// <summary>
+/// SNE Vx, kk
+/// 
+/// Skips next instruction if Vx does not equal kk
+/// </summary>
+/// <param name="ax">ax</param>
+/// <param name="kk">kk</param>
+void sne(unsigned char ax, unsigned char kk)
+{
+	if (_v[ax] != kk) {
+		_pc += 2;
+	}
+}
+
+/// <summary>
+/// Loads value kk into address ax
+/// </summary>
+/// <param name="ax">ax</param>
+/// <param name="kk">kk</param>
+void ld(unsigned char ax, unsigned char kk)
+{
+	_v[ax] = kk;
+}
+
+/// <summary>
+/// ADD Vx, kk
+/// 
+/// Adds Vx to kk and stores result at Vx
+/// 
+/// Sets carry register if necessary
+/// </summary>
+/// <param name="ax">ax</param>
+/// <param name="kk">kk</param>
+void add(unsigned char ax, unsigned char kk)
+{
+	_v[0xf] = _v[ax] + kk > 255 ? 1 : 0;
+	_v[ax] += kk;
 }
 
 /// <summary>
@@ -202,19 +230,7 @@ void shl(unsigned char ax)
 	_v[ax] *= 2;
 }
 
-/// <summary>
-/// SNE Vx, kk
-/// 
-/// Skips next instruction if Vx does not equal kk
-/// </summary>
-/// <param name="ax">ax</param>
-/// <param name="kk">kk</param>
-void sne(unsigned char ax, unsigned char kk)
-{
-	if (_v[ax] != kk) {
-		_pc += 2;
-	}
-}
+
 
 /// <summary>
 /// OR Vx, kk
@@ -250,16 +266,6 @@ void and(unsigned char ax, unsigned char kk)
 void xor(unsigned char ax, unsigned char kk)
 {
 	_v[ax] = (0xFF * (_v[ax] ^ kk));
-}
-
-/// <summary>
-/// Loads value kk into address ax
-/// </summary>
-/// <param name="ax">ax</param>
-/// <param name="kk">kk</param>
-void ld(unsigned char ax, unsigned char kk)
-{
-	_v[ax] = kk;
 }
 
 /// <summary>
@@ -351,12 +357,19 @@ unsigned char *get_display()
 
 void execute_instruction(unsigned short opcode) 
 {
-	emu_step++;
-	//printf("\nstep %d / %d / pc %d", emu_step, opcode, _pc);
-	
+	cycle_count++;
+	//if (cycle_count > 320)
+	//	return;
+
 	unsigned char x = (opcode & 0x0F00) >> 8;
 	unsigned char y = (opcode & 0x00F0) >> 4;
+	
+	if (_config->verbose == 1) {
+		printf("\nstep %d / %d / pc %d / x %d / dt %d", cycle_count, opcode, _pc, _v[x], _dt);
+	}
+	
 	_pc += 2;
+	
 	switch(opcode & 0xF000) {
 
 			case 0x0000 :
@@ -487,12 +500,14 @@ void execute_instruction(unsigned short opcode)
 					{
 						_memory[_i + i] = _v[i];
 					}
+					_i += x + 1;
 				break;
 				case 0x0065 :
 					for (int i = 0; i <= x; i++)
 					{
 						ld(i, _memory[_i + i]);
 					}
+					_i += x + 1;
 				break;
 			}
 		break;
@@ -505,6 +520,8 @@ void cpu_cycle() {
 		
 		execute_instruction(_opcode);
 		
+	}
+	
 		if (_dt > 0)
 		{
 			_dt--;
@@ -514,6 +531,5 @@ void cpu_cycle() {
 		{
 			_st--;
 		}
-	}
 }
 
