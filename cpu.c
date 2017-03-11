@@ -10,7 +10,7 @@ unsigned char _v[16];
 int _pc;
 unsigned char _display[32 * 64];
 bool _poweredUp = false;
-bool _halted = true;
+bool _halted = false;
 unsigned short _i;
 unsigned short _stack[16];
 short _sp;
@@ -351,18 +351,22 @@ unsigned char *get_display()
 	return _display;
 }
 
+unsigned char x;
+unsigned char y;
 void execute_instruction(unsigned short opcode) 
 {
 	cycle_count++;
 	
-	unsigned char x = (opcode & 0x0F00) >> 8;
-	unsigned char y = (opcode & 0x00F0) >> 4;
+	
+	x = (opcode & 0x0F00) >> 8;
+	y = (opcode & 0x00F0) >> 4;
 	
 	if (_config->verbose == 1) {
 		printf("step %d / %d / pc %d / x %d / y %d / sp %d / dt %d / vy14 %d\n", cycle_count, opcode, _pc, _v[x], _v[y], _sp, _dt, _v[14]);
 	}
 	
-	_pc += 2;
+	if (!_halted)
+		_pc += 2;
 	
 	switch(opcode & 0xF000) {
 
@@ -508,10 +512,15 @@ void execute_instruction(unsigned short opcode)
 	}
 }
 int step = 0;
+unsigned short _opcode;
 void cpu_cycle() {
 	for (int i = 0; i < 10; i++) {
-		unsigned short _opcode = (_memory[_pc] << 8) | _memory[_pc + 1];
+		if (!_halted) {
+		_opcode = (_memory[_pc] << 8) | _memory[_pc + 1];
+		}
 		execute_instruction(_opcode);
+		
+		
 	}
 	
 	if (!(step++ %2)) {
