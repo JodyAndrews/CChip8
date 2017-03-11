@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include "config.h"
+#include <simple2d.h>
 
 unsigned char _memory[4096];
 unsigned char _v[16];
@@ -19,12 +20,13 @@ unsigned char _dt;
 int cycle_count = 0;
 struct config *_config;
 int _keys[16];
+S2D_Sound *snd1;
 
 void cpu_init(struct config *config) 
 {
 	_config = config;
 	srand(time(NULL));
-
+	snd1 = S2D_CreateSound("media/beep.wav");
 	_pc = 0x200;
 	_sp &= 0;
 	_dt = 0;
@@ -523,7 +525,7 @@ void cpu_cycle() {
 		
 	}
 	
-	if (!(step++ %2)) {
+	//if (!(step++ %2)) {
 		if (_dt > 0)
 		{
 			_dt--;
@@ -531,8 +533,11 @@ void cpu_cycle() {
 		
 		if (_st > 0) 
 		{
+			if (_st == 1) {
+				S2D_PlaySound(snd1);
+			}
 			_st--;
 		}
-	}
+	//}
 }
 
