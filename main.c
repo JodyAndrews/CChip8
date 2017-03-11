@@ -191,7 +191,10 @@ int main(int argc, char *argv[]) {
 	
 	window->on_key = on_key;
 
-	rom_load(argv[1]);
+	int ret = rom_load(argv[1]);
+	if (ret != 0)
+		return 0;
+		
 	cpu_init(&configstruct);
 	power_up(rom_getbytes());
 	

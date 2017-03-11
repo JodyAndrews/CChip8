@@ -11,7 +11,7 @@ int rom_load(const char *filename)
 	if (!file)
 	{
 		fprintf(stderr, "Unable to open file %s", filename);
-		return 0;
+		return 1;
 	}
 
 	fread(_memory + 0x200, 1, 4096 - 0x200, file);
