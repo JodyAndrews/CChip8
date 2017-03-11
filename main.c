@@ -33,15 +33,20 @@ struct config get_config(char *filename)
 			cfline = strstr((char *)line,DELIM);
 			cfline = cfline + strlen(DELIM);
 
-			unsigned char value;
-			value = strtol(cfline, NULL, 0);
-			
 			if (i == 0) {
+				unsigned char value;
+				value = strtol(cfline, NULL, 0);
 				configstruct.pixel_size = value;
 				printf("\npixel size [%d]", configstruct.pixel_size);
 			} else if (i == 1) {
+				unsigned char value;
+				value = strtol(cfline, NULL, 0);
 				configstruct.verbose = value;
 				printf(" | verbose [%d]", configstruct.verbose);
+			} else if (i == 2) {
+				memcpy(configstruct.rom_path,cfline,strlen(cfline));
+				configstruct.rom_path[strlen(cfline)] = '\0';
+				printf(" | rom path [%s]", configstruct.rom_path);
 			}
 			
 			i++;
@@ -191,7 +196,9 @@ int main(int argc, char *argv[]) {
 	
 	window->on_key = on_key;
 
-	int ret = rom_load(argv[1]);
+//printf(" | rom path [%s]", configstruct.rom_path);
+	int ret = rom_load(argv[1], &configstruct);
+	//printf(" | rom path [%s]", configstruct.rom_path);
 	if (ret != 0)
 		return 0;
 		

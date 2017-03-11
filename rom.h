@@ -1,7 +1,9 @@
 #ifndef ROM_H
 #define ROM_H
 
-int rom_load(const char *);
+#include "config.h"
+
+int rom_load(const char *, struct config *config);
 unsigned char *rom_getbytes(void);
 
 #endif
