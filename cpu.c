@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include "config.h"
 
 unsigned char _memory[4096];
 unsigned char _v[16];
@@ -16,9 +17,12 @@ short _sp;
 unsigned char _st;
 unsigned char _dt;
 int emu_step = 0;
+struct config *_config;
+int _keys[16];
 
-void cpu_init() 
+void cpu_init(struct config *config) 
 {
+	_config = config;
 	srand(time(NULL));
 	printf("Initialising CPU");
 	_pc = 0x200;
@@ -29,6 +33,7 @@ void cpu_init()
 	{
 		_v[i] = 0;
 		_stack[i] = 0;
+		_keys[i] = 0;
 	}
 }
 
@@ -61,6 +66,11 @@ void power_up(unsigned char *bytes) {
 	for (i = 0; i < (4096); ++i) {
 		_memory[i] = bytes[i];
 	}
+}
+
+void set_key(int index, int val)
+{
+	_keys[index] = val;
 }
 
 // Instructions

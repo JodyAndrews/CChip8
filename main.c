@@ -9,18 +9,11 @@
 #include <simple2d.h>
 #include "rom.h"
 #include "cpu.h"
+#include "config.h"
 
 #define CONFIG "cchip8.ini"
 #define MAXBUF 1024
 #define DELIM "="
-
-struct config
-{
-	unsigned char pixel_size;
-	unsigned char verbose;
-	int window_width;
-	int window_height;
-};
 
 struct config configstruct;
 
@@ -98,6 +91,22 @@ void update() {
 	cpu_cycle();
 }
 
+void on_key(S2D_Event e, const char *key) {
+  switch (e) {
+    case S2D_KEYDOWN:
+        printf("Key %s pressed\n", key);
+      break;
+
+    case S2D_KEY:
+      printf("Key %s held down\n", key);
+      break;
+
+    case S2D_KEYUP:
+      printf("Key %s released\n", key);
+      break;
+  }
+}
+
 int main(int argc, char *argv[]) {
 	printf("starting...\n");
 	printf("reading config from %s", CONFIG);
@@ -121,9 +130,11 @@ int main(int argc, char *argv[]) {
 	S2D_Window *window = S2D_CreateWindow(
 		"CChip8", configstruct.window_width, configstruct.window_height, update, render, 0
 	);
+	
+	window->on_key = on_key;
 
 	rom_load(argv[1]);
-	cpu_init();
+	cpu_init(&configstruct);
 	power_up(rom_getbytes());
 	
 	S2D_Show(window);
