@@ -109,11 +109,8 @@ void jp(unsigned short kkk)
 /// <param name="addr">addr</param>
 void call(unsigned short addr)
 {
-	/*_stack[_sp] = _pc;
-	_pc = addr;
-	_sp++;*/
-	
-	_stack[_sp++] = _pc;
+	_stack[_sp] = _pc;
+	_sp++;
 	_pc = addr;
 }
 
@@ -126,7 +123,6 @@ void call(unsigned short addr)
 /// <param name="kk">kk</param>
 void se(unsigned char ax, unsigned char kk)
 {
-	printf("\n (SE) %d %d", _v[ax], kk); 
 	if (_v[ax] == kk) 
 	{
 		_pc += 2;
@@ -227,7 +223,7 @@ void subn(unsigned char ax, unsigned char kk)
 void shl(unsigned char ax)
 {
 	_v[0xf] = _v[ax] >> 7;
-	_v[ax] *= 2;
+	_v[ax] = _v[ax] << 1;
 }
 
 
@@ -265,7 +261,7 @@ void and(unsigned char ax, unsigned char kk)
 /// <param name="kk">kk</param>
 void xor(unsigned char ax, unsigned char kk)
 {
-	_v[ax] = (0xFF * (_v[ax] ^ kk));
+	_v[ax] ^= kk;
 }
 
 /// <summary>
@@ -358,14 +354,12 @@ unsigned char *get_display()
 void execute_instruction(unsigned short opcode) 
 {
 	cycle_count++;
-	//if (cycle_count > 320)
-	//	return;
-
+	
 	unsigned char x = (opcode & 0x0F00) >> 8;
 	unsigned char y = (opcode & 0x00F0) >> 4;
 	
 	if (_config->verbose == 1) {
-		printf("\nstep %d / %d / pc %d / x %d / dt %d", cycle_count, opcode, _pc, _v[x], _dt);
+		printf("step %d / %d / pc %d / x %d / y %d / sp %d / dt %d / vy14 %d\n", cycle_count, opcode, _pc, _v[x], _v[y], _sp, _dt, _v[14]);
 	}
 	
 	_pc += 2;
@@ -432,7 +426,7 @@ void execute_instruction(unsigned short opcode)
 				case 0x0007 :
 					subn(x, _v[y]);
 				break;
-				case 0x0008 :
+				case 0x000E :
 					shl(x);
 				break;
 			}
@@ -513,15 +507,14 @@ void execute_instruction(unsigned short opcode)
 		break;
 	}
 }
-
+int step = 0;
 void cpu_cycle() {
 	for (int i = 0; i < 10; i++) {
 		unsigned short _opcode = (_memory[_pc] << 8) | _memory[_pc + 1];
-		
 		execute_instruction(_opcode);
-		
 	}
 	
+	if (!(step++ %2)) {
 		if (_dt > 0)
 		{
 			_dt--;
@@ -531,5 +524,6 @@ void cpu_cycle() {
 		{
 			_st--;
 		}
+	}
 }
 
