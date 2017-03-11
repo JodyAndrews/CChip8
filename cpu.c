@@ -21,6 +21,7 @@ int cycle_count = 0;
 struct config *_config;
 int _keys[16];
 S2D_Sound *snd1;
+unsigned short _opcode;
 
 void cpu_init(struct config *config) 
 {
@@ -353,15 +354,12 @@ unsigned char *get_display()
 	return _display;
 }
 
-unsigned char x;
-unsigned char y;
 void execute_instruction(unsigned short opcode) 
 {
 	cycle_count++;
 	
-	
-	x = (opcode & 0x0F00) >> 8;
-	y = (opcode & 0x00F0) >> 4;
+	unsigned char x = (opcode & 0x0F00) >> 8;
+	unsigned char y = (opcode & 0x00F0) >> 4;
 
 	if (_config->verbose == 1) {
 		printf("step %d / %d / pc %d / x %d / y %d / sp %d / dt %d \n", cycle_count, opcode, _pc, _v[x], _v[y], _sp, _dt);
@@ -513,8 +511,7 @@ void execute_instruction(unsigned short opcode)
 		break;
 	}
 }
-int step = 0;
-unsigned short _opcode;
+
 void cpu_cycle() {
 	for (int i = 0; i < 10; i++) {
 		if (!_halted) {
@@ -525,19 +522,17 @@ void cpu_cycle() {
 		
 	}
 	
-	//if (!(step++ %2)) {
-		if (_dt > 0)
-		{
-			_dt--;
+	if (_dt > 0)
+	{
+		_dt--;
+	}
+	
+	if (_st > 0) 
+	{
+		if (_st == 1) {
+			S2D_PlaySound(snd1);
 		}
-		
-		if (_st > 0) 
-		{
-			if (_st == 1) {
-				S2D_PlaySound(snd1);
-			}
-			_st--;
-		}
-	//}
+		_st--;
+	}
 }
 
