@@ -24,7 +24,7 @@ void cpu_init(struct config *config)
 {
 	_config = config;
 	srand(time(NULL));
-	printf("Initialising CPU");
+
 	_pc = 0x200;
 	_sp &= 0;
 	_dt = 0;
@@ -55,7 +55,7 @@ void power_up(unsigned char *bytes) {
         0xF0, 0x80, 0x80, 0x80, 0xF0, // C
         0xE0, 0x90, 0x90, 0x90, 0xE0, // D
         0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-        0xF0, 0x80, 0xF0, 0x80, 0x80 // F
+        0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 	};
 
 	unsigned int i;
@@ -72,8 +72,6 @@ void set_key(int index, int val)
 {
 	_keys[index] = val;
 }
-
-// Instructions
 
 /// <summary>
 /// Clears the display buffer
@@ -294,7 +292,9 @@ void drw(unsigned char ax, unsigned char ay, unsigned char height)
 /// <param name="ax">ax</param>
 void skp(unsigned char ax)
 {
-	
+	if (_keys[ax] == 1) {
+		_pc += 2;
+	}
 }
 
 /// <summary>
@@ -303,7 +303,9 @@ void skp(unsigned char ax)
 /// <param name="ax">ax</param>
 void sknp(unsigned char ax)
 {
-	_pc += 2;
+	if (_keys[ax] != 1) {
+		_pc += 2;
+	}
 }
 
 void ldi(unsigned short value)
@@ -453,7 +455,17 @@ void execute_instruction(unsigned short opcode)
 					ld(x, _dt);
 				break;
 				case 0x000A :
-				
+					_halted = true;
+					
+					for (int i = 0; i < 16; i++)
+					{
+						if (_keys[i] != 0)
+						{
+							_v[x] = i;
+							_halted = false;
+							continue;
+						}
+					}
 				break;
 				case 0x0015 :
 					_dt = _v[x];
