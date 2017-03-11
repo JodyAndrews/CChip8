@@ -14,8 +14,6 @@
 #define MAXBUF 1024
 #define DELIM "="
 
-int displaySize = 32*64;
-
 struct config
 {
 	unsigned char pixel_size;
