@@ -22,7 +22,7 @@ unsigned short _opcode;
 /// </summary>
 void cpu_init() {
     // Initialise PRNG (Pseudo-Random Number Generator for rand()
-    srand((unsigned int)time(NULL));
+    srand((unsigned int) time(NULL));
     snd1 = S2D_CreateSound("../media/beep.wav");
     // Initialise Program Counter to 0x200. The start location for most ROMs
     _pc = 0x200;
@@ -132,7 +132,7 @@ void se(unsigned char ax, unsigned char kk) {
 /// <param name="kk">kk</param>
 void sne(unsigned char ax, unsigned char kk) {
     if (_v[ax] != kk) {
-        _pc += 2;
+        _pc = (unsigned short)((_pc + 2) & 0xFFF);
     }
 }
 
@@ -155,7 +155,7 @@ void ld(unsigned char ax, unsigned char kk) {
 /// <param name="ax">ax</param>
 /// <param name="kk">kk</param>
 void add(unsigned char ax, unsigned char kk) {
-    _v[0xf] = (unsigned char)(_v[ax] + kk > 255);
+    _v[0xf] = (unsigned char) (_v[ax] + kk > 255);
     _v[ax] += kk;
 }
 
@@ -169,7 +169,7 @@ void add(unsigned char ax, unsigned char kk) {
 /// <param name="ax">ax</param>
 /// <param name="kk">kk</param>
 void sub(unsigned char ax, unsigned char kk) {
-    _v[0x0f] = (unsigned char)(_v[ax] >= kk);
+    _v[0x0f] = (unsigned char) (_v[ax] >= kk);
     _v[ax] -= kk;
 }
 
@@ -182,7 +182,7 @@ void sub(unsigned char ax, unsigned char kk) {
 /// </summary>
 /// <param name="vx">ax</param>
 void shr(unsigned char ax) {
-    _v[0xf] = (unsigned char)(_v[ax] & 0x1);
+    _v[0xf] = (unsigned char) (_v[ax] & 0x1);
     _v[ax] /= 2;
 }
 
@@ -257,7 +257,8 @@ void drw(unsigned char ax, unsigned char ay, unsigned char height) {
     _v[0xf] = 0x0000;
     for (int y = 0; y < height; y++) {
         pixel = _memory[_i + y];
-        for (int x = 0; x < 8; x++) {
+        for (int x = 0; x < 8; x++)
+        {
             if ((pixel & (0x80 >> x)) != 0 && ((_v[ay] + y < 32))) {
                 _display[(_v[ax] + x + ((_v[ay] + y) * 64))] ^= 0x0001;
                 _v[0xf] = _display[_v[ax] + x + ((_v[ay] + y) * 64)] ? 0x0000 : 0x0001;
@@ -298,7 +299,8 @@ void ldi(unsigned short value) {
 /// <param name="ax">ax</param>
 /// <param name="kk">kk</param>
 void rnd(unsigned char ax, unsigned char kk) {
-    int r = rand();      // returns a pseudo-random integer between 0 and RAND_MAX
+    // returns a pseudo-random integer between 0 and RAND_MAX
+    int r = rand();
     _v[ax] = (r & kk);
 }
 
@@ -333,8 +335,9 @@ void execute_instruction(unsigned short opcode) {
     unsigned char x = (opcode & 0x0F00) >> 8;
     unsigned char y = (opcode & 0x00F0) >> 4;
 
-    if (!_halted)
+    if (!_halted) {
         _pc += 2;
+    }
 
     switch (opcode & 0xF000) {
         case 0x0000 :
@@ -423,8 +426,9 @@ void execute_instruction(unsigned short opcode) {
                 case 0x00A1 :
                     sknp(_v[x]);
                     break;
+                default:
+                    break;
             }
-            break;
         case 0xF000 :
             switch (opcode & 0x00FF) {
                 case 0x0007 :
@@ -468,8 +472,9 @@ void execute_instruction(unsigned short opcode) {
                     }
                     _i += x + 1;
                     break;
+                default:
+                    break;
             }
-            break;
     }
 }
 

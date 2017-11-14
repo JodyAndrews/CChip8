@@ -12,6 +12,7 @@ set(SOURCE_FILES
 
 add_executable(CChip8 ${SOURCE_FILES})
 
+# Find and add Simple2D Libs
 find_path(SIMPLE2D_INCLUDE_DIR simple2d.h
         /usr/local/include
         /usr/local/include/simple2d
