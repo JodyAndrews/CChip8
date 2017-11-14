@@ -4,7 +4,7 @@
 
 unsigned char _memory[4096];
 unsigned char _v[16];
-int _pc;
+unsigned short _pc;
 unsigned char _display[32 * 64];
 bool _halted = false;
 unsigned short _i;
@@ -17,9 +17,14 @@ int _keys[16];
 S2D_Sound *snd1;
 unsigned short _opcode;
 
+/// <summary>
+/// Initialises the CPU
+/// </summary>
 void cpu_init() {
-    srand(time(NULL));
+    // Initialise PRNG (Pseudo-Random Number Generator for rand()
+    srand((unsigned int)time(NULL));
     snd1 = S2D_CreateSound("../media/beep.wav");
+    // Initialise Program Counter to 0x200. The start location for most ROMs
     _pc = 0x200;
     _sp &= 0;
     _dt = 0;
@@ -32,7 +37,6 @@ void cpu_init() {
 }
 
 void power_up(unsigned char *bytes) {
-
     unsigned char fonts[80] = {
             0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
             0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -311,10 +315,15 @@ void bcd(unsigned char ax) {
     }
 }
 
+/// <summary>
+/// Return bytes that make up the current display
+/// </summary>
 unsigned char *get_display() {
     return _display;
 }
 
+/// Execute instruction
+/// \param opcode
 void execute_instruction(unsigned short opcode) {
     cycle_count++;
 
@@ -461,6 +470,7 @@ void execute_instruction(unsigned short opcode) {
     }
 }
 
+/// Cycle through CPU instructions
 void cpu_cycle() {
     for (int i = 0; i < 10; i++) {
         if (!_halted) {
@@ -480,4 +490,3 @@ void cpu_cycle() {
         _st--;
     }
 }
-
