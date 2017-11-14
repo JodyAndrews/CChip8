@@ -8,6 +8,10 @@ Install Simple2D and compile project : cc *.c `simple2d --libs` -o cchip8
 
 Then execute cchip8 --rom <rom path> (ie. ./cchip8 --rom roms/INVADERS)
 
+#### Notable Bugs
+
+Invaders does not always advance to next level
+
 #### Credits
 
 Joseph Weisbecker : Original Chip-8 creator.

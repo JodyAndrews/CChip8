@@ -57,6 +57,7 @@ void power_up(unsigned char *bytes) {
     };
 
     unsigned int i;
+    // Load FONTS from 0x0 to 0x50
     for (i = 0; i < 0x50; i++) {
         bytes[i] = fonts[i];
     }
@@ -66,6 +67,9 @@ void power_up(unsigned char *bytes) {
     }
 }
 
+/// Set a key press for the CPU to evaluate
+/// \param index
+/// \param val
 void set_key(int index, int val) {
     _keys[index] = val;
 }
@@ -151,7 +155,7 @@ void ld(unsigned char ax, unsigned char kk) {
 /// <param name="ax">ax</param>
 /// <param name="kk">kk</param>
 void add(unsigned char ax, unsigned char kk) {
-    _v[0xf] = _v[ax] + kk > 255 ? 1 : 0;
+    _v[0xf] = (unsigned char)(_v[ax] + kk > 255);
     _v[ax] += kk;
 }
 
@@ -165,7 +169,7 @@ void add(unsigned char ax, unsigned char kk) {
 /// <param name="ax">ax</param>
 /// <param name="kk">kk</param>
 void sub(unsigned char ax, unsigned char kk) {
-    _v[0x0f] = (_v[ax] >= kk) ? 1 : 0;
+    _v[0x0f] = (unsigned char)(_v[ax] >= kk);
     _v[ax] -= kk;
 }
 
@@ -178,7 +182,7 @@ void sub(unsigned char ax, unsigned char kk) {
 /// </summary>
 /// <param name="vx">ax</param>
 void shr(unsigned char ax) {
-    _v[0xf] = _v[ax] & 0x1;
+    _v[0xf] = (unsigned char)(_v[ax] & 0x1);
     _v[ax] /= 2;
 }
 
@@ -208,7 +212,6 @@ void shl(unsigned char ax) {
     _v[0xf] = _v[ax] >> 7;
     _v[ax] = _v[ax] << 1;
 }
-
 
 /// <summary>
 /// OR Vx, kk
