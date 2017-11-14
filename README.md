@@ -4,7 +4,9 @@ Working Chip-8 interpreter / emulator with Simple2D, written in C.
 
 Install Simple2D and compile project : cc *.c `simple2d --libs` -o cchip8
 
-Then execute cchip8 INVADERS (etc)
+..alternatively compile using the CMakeList
+
+Then execute cchip8 --rom <rom path> (ie. ./cchip8 --rom roms/INVADERS)
 
 #### Credits
 

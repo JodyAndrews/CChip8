@@ -1,16 +1,11 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdbool.h>
-#include <time.h>
-#include "config.h"
 #include <simple2d.h>
 
 unsigned char _memory[4096];
 unsigned char _v[16];
 int _pc;
 unsigned char _display[32 * 64];
-bool _poweredUp = false;
 bool _halted = false;
 unsigned short _i;
 unsigned short _stack[16];
@@ -18,13 +13,11 @@ short _sp;
 unsigned char _st;
 unsigned char _dt;
 int cycle_count = 0;
-struct config *_config;
 int _keys[16];
 S2D_Sound *snd1;
 unsigned short _opcode;
 
-void cpu_init(struct config *config) {
-    _config = config;
+void cpu_init() {
     srand(time(NULL));
     snd1 = S2D_CreateSound("../media/beep.wav");
     _pc = 0x200;
@@ -328,16 +321,10 @@ void execute_instruction(unsigned short opcode) {
     unsigned char x = (opcode & 0x0F00) >> 8;
     unsigned char y = (opcode & 0x00F0) >> 4;
 
-    if (_config->verbose == 1) {
-        printf("step %d / %d / pc %d / x %d / y %d / sp %d / dt %d \n", cycle_count, opcode, _pc, _v[x], _v[y], _sp,
-               _dt);
-    }
-
     if (!_halted)
         _pc += 2;
 
     switch (opcode & 0xF000) {
-
         case 0x0000 :
             switch (opcode & 0x00FF) {
                 case 0x00E0:

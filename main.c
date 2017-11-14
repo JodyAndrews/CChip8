@@ -9,54 +9,11 @@
 #include <simple2d.h>
 #include "rom.h"
 #include "cpu.h"
-#include "config.h"
-#include <unistd.h>
 
 #define CONFIG "cchip8.ini"
 #define MAXBUF 1024
-#define DELIM "="
 
-struct config configstruct;
-
-struct config get_config(char *filename) {
-    struct config configstruct;
-    FILE *file = fopen(filename, "r");
-
-    if (file != NULL) {
-        char line[MAXBUF];
-        int i = 0;
-
-        while (fgets(line, sizeof(line), file) != NULL) {
-            char *cfline;
-            cfline = strstr((char *) line, DELIM);
-            cfline = cfline + strlen(DELIM);
-
-            if (i == 0) {
-                unsigned char value;
-                value = strtol(cfline, NULL, 0);
-                configstruct.pixel_size = value;
-                printf("\npixel size [%d]", configstruct.pixel_size);
-            } else if (i == 1) {
-                unsigned char value;
-                value = strtol(cfline, NULL, 0);
-                configstruct.verbose = value;
-                printf(" | verbose [%d]", configstruct.verbose);
-            } else if (i == 2) {
-                memcpy(configstruct.rom_path, cfline, strlen(cfline));
-                configstruct.rom_path[strlen(cfline)] = '\0';
-                printf(" | rom path [%s]", configstruct.rom_path);
-            }
-
-            i++;
-        }
-        fclose(file);
-        printf("\n");
-    } else {
-        fclose(file);
-    }
-
-    return configstruct;
-}
+char *_rom_path;
 
 void rect(int x, int y, int size, int r, int g, int b) {
     S2D_DrawQuad(x, y, r, g, b, 1,
@@ -74,7 +31,6 @@ void render() {
         for (int x = 0; x < 64; x++) {
             int g = 0;
             if (display[(y * 64) + x] != 0x0000) {
-                // printf("NOT 0\n");
                 g = 1;
             }
             rect(x * pixel_size, y * pixel_size, pixel_size, 0, g, 0);
@@ -165,9 +121,6 @@ void on_key(S2D_Event e) {
     }
 }
 
-char *_rom_path;
-unsigned char _verbose;
-
 void handle_args(int argc, char *args[]) {
     for (int i = 1; i < argc; i++) {
         if (strcmp(args[i], "--rom") == 0) {
@@ -175,17 +128,12 @@ void handle_args(int argc, char *args[]) {
             memcpy(_rom_path, args[i + 1], strlen(args[i + 1]) + 1);
             printf("Loading ROM [%s]\n", _rom_path);
             i++;
-        } else if (strcmp(args[i], "--verbose") == 0) {
-            _verbose = 0x1;
-            printf("Using Verbose Mode\n");
         }
     }
 }
 
 int main(int argc, char *args[]) {
-    printf("Reading Config from %s\n", CONFIG);
     handle_args(argc, args);
-    configstruct = get_config(CONFIG);
 
     S2D_Window *window = S2D_CreateWindow(
             "CChip8", 640, 480, cpu_cycle, render, 0
@@ -193,15 +141,15 @@ int main(int argc, char *args[]) {
 
     window->on_key = on_key;
 
-    int ret = rom_load(_rom_path, &configstruct);
+    int ret = rom_load(_rom_path);
 
-    if (ret != 1) {
+    if (ret != 0) {
         printf("Error Opening ROM File\n");
         return 1;
     }
 
     printf("Initialising\n");
-    cpu_init(&configstruct);
+    cpu_init();
     power_up(rom_getbytes());
 
     S2D_Show(window);
