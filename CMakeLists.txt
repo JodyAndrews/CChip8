@@ -8,7 +8,7 @@ set(SOURCE_FILES
         cpu.h
         main.c
         rom.c
-        rom.h)
+        rom.h lcd.c lcd.h)
 
 add_executable(CChip8 ${SOURCE_FILES})
 

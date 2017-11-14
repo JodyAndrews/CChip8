@@ -9,34 +9,9 @@
 #include <simple2d.h>
 #include "rom.h"
 #include "cpu.h"
-
-#define CONFIG "cchip8.ini"
-#define MAXBUF 1024
+#include "lcd.h"
 
 char *_rom_path;
-
-void rect(int x, int y, int size, int r, int g, int b) {
-    S2D_DrawQuad(x, y, r, g, b, 1,
-                 x + size, y, r, g, b, 1,
-                 x + size, y + size, r, g, b, 1,
-                 x, y + size, r, g, b, 1);
-}
-
-void render() {
-    int pixel_size = 10;
-
-    unsigned char *display = get_display();
-
-    for (int y = 0; y < 32; y++) {
-        for (int x = 0; x < 64; x++) {
-            int g = 0;
-            if (display[(y * 64) + x] != 0x0000) {
-                g = 1;
-            }
-            rect(x * pixel_size, y * pixel_size, pixel_size, 0, g, 0);
-        }
-    }
-}
 
 void on_key(S2D_Event e) {
 
@@ -141,14 +116,11 @@ int main(int argc, char *args[]) {
 
     window->on_key = on_key;
 
-    int ret = rom_load(_rom_path);
-
-    if (ret != 0) {
+    if (rom_load(_rom_path)) {
         printf("Error Opening ROM File\n");
         return 1;
     }
 
-    printf("Initialising\n");
     cpu_init();
     power_up(rom_getbytes());
 
